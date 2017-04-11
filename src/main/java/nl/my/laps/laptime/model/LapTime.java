@@ -14,7 +14,7 @@ public class LapTime {
     private Long id;
 
     @Column(name = "time_lap")
-    private String timeLap;
+    private Double timeLap;
 
     @Column(name = "total_race_time")
     private String totalRaceTime;
@@ -34,8 +34,12 @@ public class LapTime {
         this.id = id;
     }
 
-    public String getTimeLap() {
+    public Double getTimeLap() {
         return timeLap;
+    }
+
+    public void setTimeLap(Double timeLap) {
+        this.timeLap = timeLap;
     }
 
     public String getTotalRaceTime() {
@@ -52,10 +56,6 @@ public class LapTime {
 
     public void setLabNumber(Integer labNumber) {
         this.labNumber = labNumber;
-    }
-
-    public void setTimeLap(String timeLap) {
-        this.timeLap = timeLap;
     }
 
     public Kart getKart() {
