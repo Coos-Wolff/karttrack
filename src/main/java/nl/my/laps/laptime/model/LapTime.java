@@ -19,6 +19,9 @@ public class LapTime {
     @Column(name = "total_race_time")
     private String totalRaceTime;
 
+    @Column(name = "lap_number")
+    private Integer labNumber;
+
     @ManyToOne
     @JoinColumn(name = "kart_id", nullable = false)
     private Kart kart;
@@ -41,6 +44,14 @@ public class LapTime {
 
     public void setTotalRaceTime(String totalRaceTime) {
         this.totalRaceTime = totalRaceTime;
+    }
+
+    public Integer getLabNumber() {
+        return labNumber;
+    }
+
+    public void setLabNumber(Integer labNumber) {
+        this.labNumber = labNumber;
     }
 
     public void setTimeLap(String timeLap) {
