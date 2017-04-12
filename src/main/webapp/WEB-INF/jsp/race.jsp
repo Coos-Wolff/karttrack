@@ -15,7 +15,7 @@
         <td>${kartNumber}</td>
     </tr>
     <tr>
-        <td>${karts}</td>
+        <td>${lapTimes}</td>
     </tr>
 </table>
 </body>

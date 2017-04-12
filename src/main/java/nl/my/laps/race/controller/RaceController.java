@@ -1,8 +1,6 @@
 package nl.my.laps.race.controller;
 
-import nl.my.laps.kart.model.Kart;
-import nl.my.laps.laptime.model.LapTime;
-import nl.my.laps.simulatedlaptime.service.SimulatedLapTimeService;
+import nl.my.laps.kart.service.KartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
@@ -19,25 +17,15 @@ import java.util.*;
 public class RaceController {
 
     @Autowired
-    private SimulatedLapTimeService simulatedLapTimeService;
+    private KartService kartService;
 
     @Deprecated
     @GetMapping("/race")
     public ModelAndView test() {
-        Set<Kart> karts = simulatedLapTimeService.getLapTimesPerKart(5, 6);
-        Map<Integer, Map<Integer, Double>> mapOfKartsWithLapTimes = new HashMap<>();
-        for (Kart kart: karts) {
-            Map<Integer, Double> lapTimes = new HashMap<>();
-            for(LapTime lapTime: kart.getLapTimes()) {
-                lapTimes.put(lapTime.getLabNumber(), lapTime.getTimeLap());
-            }
-            mapOfKartsWithLapTimes.put(kart.getKartNumber(), lapTimes);
-        }
-
-
+        Map<Integer, Map<Integer, Double>> tests = kartService.getFastestLapOfAllKarts();
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("race");
-        modelAndView.addObject("karts", mapOfKartsWithLapTimes);
+        modelAndView.addObject("lapTimes", tests);
         return modelAndView;
     }
 }
