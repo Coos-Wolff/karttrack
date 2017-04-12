@@ -18,10 +18,12 @@ public class KartService {
     private SimulatedLapTimeService simulatedLapTimeService;
 
     public Map<Integer, Map<Integer, Double>> getFastestLapOfAllKarts() {
-        return getMapOfKartsWithLapNumberOfAndFastestLap(getKartNumbersWithLapNumbersAndLapTimes());
+        Map<Integer, Map<Integer, Double>> mapAllOfKarts = getAllKartsWithLapNumbersAndLapTimes();
+        Map<Integer, Map<Integer, Double>> mapFastestLapAndLapNumberAllKarts = getLapNumberAndFastestLapOfAllKarts(mapAllOfKarts);
+        return  mapFastestLapAndLapNumberAllKarts;
     }
 
-    private Map<Integer, Map<Integer, Double>> getKartNumbersWithLapNumbersAndLapTimes() {
+    private Map<Integer, Map<Integer, Double>> getAllKartsWithLapNumbersAndLapTimes() {
         Set<Kart> karts = simulatedLapTimeService.getLapTimesPerKart(5, 5);
         Map<Integer, Map<Integer, Double>> mapOfKartsWithLapTimes = new HashMap<>();
         for (Kart kart: karts) {
@@ -34,29 +36,34 @@ public class KartService {
         return mapOfKartsWithLapTimes;
     }
 
-    private Map<Integer, Map<Integer, Double>> getMapOfKartsWithLapNumberOfAndFastestLap(Map<Integer, Map<Integer, Double>> mapOfKartNumbersWithAMapOfLapNumbersAndLapTimes) {
+    private Map<Integer, Map<Integer, Double>> getLapNumberAndFastestLapOfAllKarts(Map<Integer, Map<Integer, Double>> mapAllOfKarts) {
         Map<Integer, Map<Integer, Double>> mapKartsLapNumberLapTimes = new HashMap<>();
-        Map<Integer, Double> mapOfKartsWithLapNumberAndFastestLap = new HashMap<>();
+        Map<Integer, Double> mapOfKartsWithLapNumberAndFastestLap;
         Map<Integer, Map<Integer, Double>> mapKartsWithLapNumberAndFastestLap = new HashMap<>();
-        for (Map.Entry<Integer, Map<Integer, Double>> map : mapOfKartNumbersWithAMapOfLapNumbersAndLapTimes.entrySet
-                ()) {
-            mapKartsLapNumberLapTimes.put(map.getKey(), map.getValue());
-            for (Map<Integer, Double> lapTimesInMap : mapKartsLapNumberLapTimes.values()) {
-                Map<Integer, Double> mapLapNumberAndFastestLap = new HashMap<>();
 
-                Integer key = getKeyOfLapTimesInMap(lapTimesInMap);
-                Double value = getValueOfLapTimesInMap(lapTimesInMap);
-                mapLapNumberAndFastestLap.put(key, value);
-                mapOfKartsWithLapNumberAndFastestLap = mapLapNumberAndFastestLap;
-            }
+        for (Map.Entry<Integer, Map<Integer, Double>> map : mapAllOfKarts.entrySet()) {
+            mapKartsLapNumberLapTimes.put(map.getKey(), map.getValue());
+            mapOfKartsWithLapNumberAndFastestLap = getKeyValueOfSmallestValueInMap(mapKartsLapNumberLapTimes);
             mapKartsWithLapNumberAndFastestLap.put(map.getKey(), mapOfKartsWithLapNumberAndFastestLap);
         }
         return mapKartsWithLapNumberAndFastestLap;
     }
 
+    private Map<Integer, Double> getKeyValueOfSmallestValueInMap(Map<Integer, Map<Integer, Double>> map) {
+        Map<Integer, Double> mapOfKartsWithLapNumberAndFastestLap = new HashMap<>();
+        for (Map<Integer, Double> lapTimesInMap : map.values()) {
+            Map<Integer, Double> mapLapNumberAndFastestLap = new HashMap<>();
+            Integer key = getKeyOfMap(lapTimesInMap);
+            Double value = getValueOfMap(lapTimesInMap);
+            mapLapNumberAndFastestLap.put(key, value);
+            mapOfKartsWithLapNumberAndFastestLap = mapLapNumberAndFastestLap;
+        }
+        return mapOfKartsWithLapNumberAndFastestLap;
+    }
 
-    private Integer getKeyOfLapTimesInMap(Map<Integer, Double> lapTimesInMap) {
-        return Collections.min(lapTimesInMap.entrySet(), new Comparator<Map.Entry<Integer, Double>>() {
+
+    private Integer getKeyOfMap(Map<Integer, Double> map) {
+        return Collections.min(map.entrySet(), new Comparator<Map.Entry<Integer, Double>>() {
             @Override
             public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
                 return o1.getValue().intValue() - o2.getValue().intValue();
@@ -65,8 +72,8 @@ public class KartService {
         .getKey();
     }
 
-    private Double getValueOfLapTimesInMap(Map<Integer, Double> lapTimesInMap) {
-        return Collections.min(lapTimesInMap.entrySet(), new Comparator<Map.Entry<Integer, Double>>() {
+    private Double getValueOfMap(Map<Integer, Double> map) {
+        return Collections.min(map.entrySet(), new Comparator<Map.Entry<Integer, Double>>() {
             @Override
             public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
                 return o1.getValue().intValue() - o2.getValue().intValue();
