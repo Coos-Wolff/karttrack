@@ -2,6 +2,7 @@ package nl.my.laps.kart.service;
 
 import nl.my.laps.kart.model.Kart;
 import nl.my.laps.laptime.model.LapTime;
+import nl.my.laps.models.*;
 import nl.my.laps.simulatedlaptime.service.SimulatedLapTimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,41 @@ public class KartService {
     public Map<Integer, Map<Integer, Double>> getFastestLapOfAllKarts() {
         Map<Integer, Map<Integer, Double>> mapAllOfKarts = getAllKartsWithLapNumbersAndLapTimes();
         Map<Integer, Map<Integer, Double>> mapFastestLapAndLapNumberAllKarts = getLapNumberAndFastestLapOfAllKarts(mapAllOfKarts);
+        System.out.println(mapFastestLapAndLapNumberAllKarts);
+
+        LapMoment fastestLap = getFastestLapMoment(mapFastestLapAndLapNumberAllKarts);
+        System.out.println("Fastest lap: " + fastestLap.getTime().toString() + "Lap number: " + fastestLap.getLapNumber() + " Kart: " + fastestLap.getKart());
+
         return  mapFastestLapAndLapNumberAllKarts;
+    }
+
+    private LapMoment getFastestLapMoment(Map<Integer, Map<Integer, Double>> fastestLap) {
+        List<LapMoment> listOfLapMoments = getFirstChildMapFromMap(fastestLap);
+        return Collections.min(listOfLapMoments, (p1, p2) -> {
+            if (p1.getTime() < p2.getTime()) {
+                return -1;
+            }
+            if (p1.getTime() > p2.getTime()) {
+                return 1;
+            }
+            return 0;
+        });
+    }
+
+    private List<LapMoment> getFirstChildMapFromMap(Map<Integer, Map<Integer, Double>> fastestLap){
+        List<LapMoment> lapMoments = new LinkedList<>();
+        for(Map.Entry<Integer, Map<Integer, Double>> moment : fastestLap.entrySet()){
+            for(Map.Entry<Integer, Double> entry : moment.getValue().entrySet()) {
+                LapMoment lapMoment = new LapMoment();
+                lapMoment.setLapNumber(entry.getKey());
+                lapMoment.setTime(entry.getValue());
+                lapMoment.setKart(moment.getKey());
+                lapMoments.add(lapMoment);
+                // forces to continue after the first entry.
+                continue;
+            }
+        }
+        return lapMoments;
     }
 
     private Map<Integer, Map<Integer, Double>> getAllKartsWithLapNumbersAndLapTimes() {
@@ -33,6 +68,7 @@ public class KartService {
             }
             mapOfKartsWithLapTimes.put(kart.getKartNumber(), lapTimes);
         }
+        System.out.println("Map Of Karts With LapTime:" + mapOfKartsWithLapTimes);
         return mapOfKartsWithLapTimes;
     }
 
@@ -46,6 +82,7 @@ public class KartService {
             mapOfKartsWithLapNumberAndFastestLap = getKeyValueOfSmallestValueInMap(mapKartsLapNumberLapTimes);
             mapKartsWithLapNumberAndFastestLap.put(map.getKey(), mapOfKartsWithLapNumberAndFastestLap);
         }
+        System.out.println("Map Karts With LapNumbers And Fastest Lap" + mapKartsWithLapNumberAndFastestLap);
         return mapKartsWithLapNumberAndFastestLap;
     }
 
@@ -58,6 +95,7 @@ public class KartService {
             mapLapNumberAndFastestLap.put(key, value);
             mapOfKartsWithLapNumberAndFastestLap = mapLapNumberAndFastestLap;
         }
+        System.out.println("Karts with lapnumber and fastest lap" + mapOfKartsWithLapNumberAndFastestLap);
         return mapOfKartsWithLapNumberAndFastestLap;
     }
 

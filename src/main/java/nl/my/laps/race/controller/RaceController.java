@@ -22,7 +22,10 @@ public class RaceController {
     @Deprecated
     @GetMapping("/race")
     public ModelAndView test() {
+
+        // TODO -> Map in map, omzetten naar entiteiten(modellen)
         Map<Integer, Map<Integer, Double>> tests = kartService.getFastestLapOfAllKarts();
+
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("race");
         modelAndView.addObject("lapTimes", tests);
