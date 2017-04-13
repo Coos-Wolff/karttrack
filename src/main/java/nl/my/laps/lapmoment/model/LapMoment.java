@@ -5,11 +5,11 @@ public class LapMoment {
     private Double lapMoment;
     private Integer kart;
     private String lapMomentFormat;
+    private String totalRaceTime;
 
     public Double getLapMoment() {
         return lapMoment;
     }
-
 
     public void setLapMoment(Double lapMoment) {
         this.lapMoment = lapMoment;
@@ -37,5 +37,13 @@ public class LapMoment {
 
     public void setLapMomentFormat(String lapMomentFormat) {
         this.lapMomentFormat = lapMomentFormat;
+    }
+
+    public String getTotalRaceTime() {
+        return totalRaceTime;
+    }
+
+    public void setTotalRaceTime(String totalRaceTime) {
+        this.totalRaceTime = totalRaceTime;
     }
 }
