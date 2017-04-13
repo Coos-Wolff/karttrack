@@ -5,11 +5,13 @@ import nl.my.laps.lapmoment.interfaces.LapMomentInterface;
 import nl.my.laps.lapmoment.model.LapMoment;
 import nl.my.laps.laptime.model.LapTime;
 import nl.my.laps.simulatedlaptime.interfaces.SimulatedLapTimeInterface;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.*;
-import java.text.*;
 
 @Service("lapMomentService")
 public class LapMomentService implements LapMomentInterface {
@@ -19,18 +21,18 @@ public class LapMomentService implements LapMomentInterface {
 
     // TODO get rid of System.out.println()
     @Override
-    public LapMoment getFastestLapOfAllKarts() {
-        Map<Integer, List<LapMoment>> mapFastestLapMoments = getAllKartsWithLapNumbersAndLapTimes();
+    public LapMoment getFastestLapOfAllKarts(Integer amountLaps, Integer amountKarts) {
+        Map<Integer, List<LapMoment>> mapFastestLapMoments = getAllKartsWithLapNumbersAndLapTimes(amountLaps, amountKarts);
         Map<Integer, List<LapMoment>> mapFastestLapAndLapNumberAllKarts = getFastestLapsAndLapNumberOfAllKarts(mapFastestLapMoments);
         return getFastestLapMoment(mapFastestLapAndLapNumberAllKarts);
     }
 
-    private Map<Integer, List<LapMoment>> getAllKartsWithLapNumbersAndLapTimes() {
-        Set<Kart> karts = simulatedLapTimeInterface.getLapTimesPerKart(5, 5);
+    private Map<Integer, List<LapMoment>> getAllKartsWithLapNumbersAndLapTimes(Integer amountLaps, Integer amountKarts) {
+        Set<Kart> karts = simulatedLapTimeInterface.getLapTimesPerKart(amountLaps, amountKarts);
         Map<Integer, List<LapMoment>> mapOfKartsWithLapTimes = new HashMap<>();
-        for (Kart kart: karts) {
+        for (Kart kart : karts) {
             List<LapMoment> lapMoments = new LinkedList<>();
-            for(LapTime lapTime: kart.getLapTimes()) {
+            for (LapTime lapTime : kart.getLapTimes()) {
                 LapMoment lapMoment = new LapMoment();
                 lapMoment.setKart(lapTime.getKart().getKartNumber());
                 lapMoment.setLapNumber(lapTime.getLabNumber());
@@ -68,26 +70,28 @@ public class LapMomentService implements LapMomentInterface {
         });
     }
 
-    private List<LapMoment> getListFastestLapMoments(Map<Integer, List<LapMoment>> fastestLap){
+    private List<LapMoment> getListFastestLapMoments(Map<Integer, List<LapMoment>> fastestLap) {
         List<LapMoment> lapMoments = new LinkedList<>();
-        for(Map.Entry<Integer, List<LapMoment>> moment : fastestLap.entrySet()){
-            for(LapMoment entry : moment.getValue()) {
+        for (Map.Entry<Integer, List<LapMoment>> moment : fastestLap.entrySet()) {
+            for (LapMoment entry : moment.getValue()) {
+                String lapMomentFormat = convertSecondsToMillisAndFormat(entry.getLapMoment());
                 LapMoment lapMoment = new LapMoment();
                 lapMoment.setLapNumber(entry.getLapNumber());
                 lapMoment.setLapMoment(entry.getLapMoment());
                 lapMoment.setKart(moment.getKey());
+                lapMoment.setLapMomentFormat(lapMomentFormat);
                 lapMoments.add(lapMoment);
             }
         }
         return lapMoments;
     }
 
-    private List<Double> getTotalRaceTimeOfAllKarts() {
-        Map<Integer, List<LapMoment>> allKartsLapTimesLapNumbers = getAllKartsWithLapNumbersAndLapTimes();
+    private List<Double> getTotalRaceTimeOfAllKarts(Integer amountLaps, Integer amountKarts) {
+        Map<Integer, List<LapMoment>> allKartsLapTimesLapNumbers = getAllKartsWithLapNumbersAndLapTimes(amountLaps, amountKarts);
         List<Double> lapTimes = new LinkedList<>();
-        for (List<LapMoment> lapMoments: allKartsLapTimesLapNumbers.values()) {
+        for (List<LapMoment> lapMoments : allKartsLapTimesLapNumbers.values()) {
             Double sum = 0.0;
-            for (LapMoment lapMoment: lapMoments) {
+            for (LapMoment lapMoment : lapMoments) {
                 sum += lapMoment.getLapMoment();
             }
             lapTimes.add(sum);
@@ -95,18 +99,28 @@ public class LapMomentService implements LapMomentInterface {
         return lapTimes;
     }
 
-    @Override
-    public String convertDoubleToTime(Double lapMoment) {
-        Date date = new Date((long)(lapMoment * 1000));
-        return new SimpleDateFormat("mm:ss.SSS").format(date);
+    private String convertSecondsToMillisAndFormat(Double seconds) {
+        MathContext mathContext = new MathContext(5);
+        BigDecimal formattedSeconds = new BigDecimal(seconds, mathContext);
+        String secondsToMillisString = String.valueOf(formattedSeconds);
+        String removeDot = secondsToMillisString.replace(".", "");
+        Long parsedMilliseconds = Long.parseLong(removeDot);
+        return DurationFormatUtils.formatDuration(parsedMilliseconds, "HH:mm:ss.SSS");
+    }
+
+    private String convertSecondsToMinutesFormat(Double seconds) {
+        MathContext mathContext = new MathContext(6);
+        BigDecimal formattedSeconds = new BigDecimal(seconds, mathContext);
+        String secondsToMillisString = String.valueOf(formattedSeconds);
+        String removeDot = secondsToMillisString.replace(".", "");
+        Long parsedMilliseconds = Long.parseLong(removeDot);
+        return DurationFormatUtils.formatDuration(parsedMilliseconds, "HH:mm:ss.SSS");
     }
 
     @Override
-    public String getTotalRaceTime() {
-        List<Double> totalLapTimes = getTotalRaceTimeOfAllKarts();
-        System.out.println(totalLapTimes);
+    public String getTotalRaceTime(Integer amountLaps, Integer amountKarts) {
+        List<Double> totalLapTimes = getTotalRaceTimeOfAllKarts(amountLaps, amountKarts);
         Double totalRaceTimeInSeconds = Collections.max(totalLapTimes);
-        Date date = new Date((long)(totalRaceTimeInSeconds * 1000));
-        return new SimpleDateFormat("mm:ss.SSS").format(date);
+        return convertSecondsToMinutesFormat(totalRaceTimeInSeconds);
     }
 }

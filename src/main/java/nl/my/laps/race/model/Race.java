@@ -34,4 +34,6 @@ public class Race {
     public void setKarts(Set<Kart> karts) {
         this.karts = karts;
     }
+
+
 }
