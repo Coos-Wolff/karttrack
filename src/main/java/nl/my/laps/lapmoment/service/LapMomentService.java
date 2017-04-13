@@ -1,35 +1,28 @@
-package nl.my.laps.kart.service;
+package nl.my.laps.lapmoment.service;
 
-import nl.my.laps.kart.interfaces.KartInterface;
 import nl.my.laps.kart.model.Kart;
+import nl.my.laps.lapmoment.interfaces.LapMomentInterface;
+import nl.my.laps.lapmoment.model.LapMoment;
 import nl.my.laps.laptime.model.LapTime;
-import nl.my.laps.models.*;
 import nl.my.laps.simulatedlaptime.interfaces.SimulatedLapTimeInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-@Service("kartService")
-public class KartService implements KartInterface{
+import java.text.*;
+
+@Service("lapMomentService")
+public class LapMomentService implements LapMomentInterface {
 
     @Autowired
     private SimulatedLapTimeInterface simulatedLapTimeInterface;
 
     // TODO get rid of System.out.println()
+    @Override
     public LapMoment getFastestLapOfAllKarts() {
         Map<Integer, List<LapMoment>> mapFastestLapMoments = getAllKartsWithLapNumbersAndLapTimes();
-        for (List<LapMoment> lapMoments: mapFastestLapMoments.values())
-            for (LapMoment lapMoment: lapMoments) {
-                System.out.println("Kart Number: " + lapMoment.getKart());
-                System.out.println("Lap Number: " + lapMoment.getLapNumber());
-                System.out.println("Lap Time: " + lapMoment.getTime());
-                System.out.println("\n");
-
-            }
         Map<Integer, List<LapMoment>> mapFastestLapAndLapNumberAllKarts = getFastestLapsAndLapNumberOfAllKarts(mapFastestLapMoments);
-        LapMoment fastestLap = getFastestLapMoment(mapFastestLapAndLapNumberAllKarts);
-        System.out.println("Fastest lap: " + fastestLap.getTime().toString() + "\nLap number: " + fastestLap.getLapNumber() + "\nKart: " + fastestLap.getKart());
-        return fastestLap;
+        return getFastestLapMoment(mapFastestLapAndLapNumberAllKarts);
     }
 
     private Map<Integer, List<LapMoment>> getAllKartsWithLapNumbersAndLapTimes() {
@@ -41,7 +34,7 @@ public class KartService implements KartInterface{
                 LapMoment lapMoment = new LapMoment();
                 lapMoment.setKart(lapTime.getKart().getKartNumber());
                 lapMoment.setLapNumber(lapTime.getLabNumber());
-                lapMoment.setTime(lapTime.getTimeLap());
+                lapMoment.setLapMoment(lapTime.getTimeLap());
                 lapMoments.add(lapMoment);
             }
             mapOfKartsWithLapTimes.put(kart.getKartNumber(), lapMoments);
@@ -65,10 +58,10 @@ public class KartService implements KartInterface{
     private LapMoment getFastestLapMoment(Map<Integer, List<LapMoment>> fastestLap) {
         List<LapMoment> listOfLapMoments = getListFastestLapMoments(fastestLap);
         return Collections.min(listOfLapMoments, (list1, list2) -> {
-            if (list1.getTime() < list2.getTime()) {
+            if (list1.getLapMoment() < list2.getLapMoment()) {
                 return -1;
             }
-            if (list1.getTime() > list2.getTime()) {
+            if (list1.getLapMoment() > list2.getLapMoment()) {
                 return 1;
             }
             return 0;
@@ -81,11 +74,39 @@ public class KartService implements KartInterface{
             for(LapMoment entry : moment.getValue()) {
                 LapMoment lapMoment = new LapMoment();
                 lapMoment.setLapNumber(entry.getLapNumber());
-                lapMoment.setTime(entry.getTime());
+                lapMoment.setLapMoment(entry.getLapMoment());
                 lapMoment.setKart(moment.getKey());
                 lapMoments.add(lapMoment);
             }
         }
         return lapMoments;
+    }
+
+    private List<Double> getTotalRaceTimeOfAllKarts() {
+        Map<Integer, List<LapMoment>> allKartsLapTimesLapNumbers = getAllKartsWithLapNumbersAndLapTimes();
+        List<Double> lapTimes = new LinkedList<>();
+        for (List<LapMoment> lapMoments: allKartsLapTimesLapNumbers.values()) {
+            Double sum = 0.0;
+            for (LapMoment lapMoment: lapMoments) {
+                sum += lapMoment.getLapMoment();
+            }
+            lapTimes.add(sum);
+        }
+        return lapTimes;
+    }
+
+    @Override
+    public String convertDoubleToTime(Double lapMoment) {
+        Date date = new Date((long)(lapMoment * 1000));
+        return new SimpleDateFormat("mm:ss.SSS").format(date);
+    }
+
+    @Override
+    public String getTotalRaceTime() {
+        List<Double> totalLapTimes = getTotalRaceTimeOfAllKarts();
+        System.out.println(totalLapTimes);
+        Double totalRaceTimeInSeconds = Collections.max(totalLapTimes);
+        Date date = new Date((long)(totalRaceTimeInSeconds * 1000));
+        return new SimpleDateFormat("mm:ss.SSS").format(date);
     }
 }

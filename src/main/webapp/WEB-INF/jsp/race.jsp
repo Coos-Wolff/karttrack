@@ -20,6 +20,9 @@
     <tr>
         <td>Lap Time: ${time}</td>
     </tr>
+    <tr>
+        <td>Total Race Time: ${totalRaceTime}</td>
+    </tr>
 </table>
 </body>
 </html>

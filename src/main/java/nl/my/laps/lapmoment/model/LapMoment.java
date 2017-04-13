@@ -1,18 +1,18 @@
-package nl.my.laps.models;
+package nl.my.laps.lapmoment.model;
 
 public class LapMoment {
     private Integer lapNumber;
 
-    private Double time;
+    private Double lapMoment;
 
     private Integer kart;
 
-    public Double getTime() {
-        return time;
+    public Double getLapMoment() {
+        return lapMoment;
     }
 
-    public void setTime(Double time) {
-        this.time = time;
+    public void setLapMoment(Double lapMoment) {
+        this.lapMoment = lapMoment;
     }
 
     public Integer getLapNumber() {
@@ -31,12 +31,3 @@ public class LapMoment {
         this.kart = kart;
     }
 }
-
-
-/*
-* Race
-*   Session (datum, tijd, plaats, etc)
-*       Drivers (naam, plaats, leeftijd, ervaring, kart)
-    *       Kart (cc, banden, etc.)
-*       Laps (drivers)
-* */
