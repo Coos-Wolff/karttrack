@@ -1,13 +1,12 @@
 package nl.my.laps.race.controller;
 
-import nl.my.laps.kart.service.KartService;
+import nl.my.laps.kart.interfaces.KartInterface;
+import nl.my.laps.models.LapMoment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.*;
 
 /**
  * Created by CoosW on 12/04/2017.
@@ -17,18 +16,18 @@ import java.util.*;
 public class RaceController {
 
     @Autowired
-    private KartService kartService;
+    private KartInterface kartInterface;
 
     @Deprecated
     @GetMapping("/race")
-    public ModelAndView test() {
-
-        // TODO -> Map in map, omzetten naar entiteiten(modellen)
-        Map<Integer, Map<Integer, Double>> tests = kartService.getFastestLapOfAllKarts();
+    public ModelAndView race() {
+        LapMoment fastestLapOfAllKarts = kartInterface.getFastestLapOfAllKarts();
 
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("race");
-        modelAndView.addObject("lapTimes", tests);
+        modelAndView.addObject("kart", fastestLapOfAllKarts.getKart());
+        modelAndView.addObject("lap", fastestLapOfAllKarts.getLapNumber());
+        modelAndView.addObject("time", fastestLapOfAllKarts.getTime());
         return modelAndView;
     }
 }

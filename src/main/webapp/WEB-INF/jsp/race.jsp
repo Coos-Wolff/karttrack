@@ -12,10 +12,13 @@
 <body>
 <table>
     <tr>
-        <td>${kartNumber}</td>
+        <td>Kart Number: ${kart}</td>
     </tr>
     <tr>
-        <td>${lapTimes}</td>
+        <td>Lap Number: ${lap}</td>
+    </tr>
+    <tr>
+        <td>Lap Time: ${time}</td>
     </tr>
 </table>
 </body>
