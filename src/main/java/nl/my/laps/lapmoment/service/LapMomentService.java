@@ -17,18 +17,19 @@ import java.util.*;
 public class LapMomentService implements LapMomentInterface {
 
     @Autowired
-    private SimulatedLapTimeInterface simulatedLapTimeInterface;
+    private SimulatedLapTimeInterface simulatedLapTimeInterFace;
 
-    // TODO get rid of System.out.println()
     @Override
     public LapMoment getFastestLapOfAllKarts(Integer amountLaps, Integer amountKarts) {
-        Map<Integer, List<LapMoment>> mapKartsLapNumbersLapMoments = getKartsLapNumbersLapMoments(amountLaps, amountKarts);
-        Map<Integer, List<LapMoment>> mapFastestLapAndLapNumberAllKarts = getFastestLapsAndLapNumberOfAllKarts(mapKartsLapNumbersLapMoments);
+        Map<Integer, List<LapMoment>> mapKartsLapNumbersLapMoments = getKartsLapNumbersLapMoments(amountLaps,
+                amountKarts);
+        Map<Integer, List<LapMoment>> mapFastestLapAndLapNumberAllKarts = getFastestLapsAndLapNumberOfAllKarts
+                (mapKartsLapNumbersLapMoments);
         return getFastestLapMoment(mapFastestLapAndLapNumberAllKarts);
     }
 
     private Map<Integer, List<LapMoment>> getKartsLapNumbersLapMoments(Integer amountLaps, Integer amountKarts) {
-        Set<Kart> karts = simulatedLapTimeInterface.getLapTimesPerKart(amountLaps, amountKarts);
+        Set<Kart> karts = simulatedLapTimeInterFace.getLapTimesPerKart(amountLaps, amountKarts);
         Map<Integer, List<LapMoment>> mapOfKartsWithLapTimes = new HashMap<>();
         for (Kart kart : karts) {
             List<LapMoment> lapMoments = new LinkedList<>();
@@ -44,7 +45,8 @@ public class LapMomentService implements LapMomentInterface {
         return mapOfKartsWithLapTimes;
     }
 
-    private Map<Integer, List<LapMoment>> getFastestLapsAndLapNumberOfAllKarts(Map<Integer, List<LapMoment>> mapAllOfKarts) {
+    private Map<Integer, List<LapMoment>> getFastestLapsAndLapNumberOfAllKarts(Map<Integer, List<LapMoment>>
+                                                                                       mapAllOfKarts) {
         Map<Integer, List<LapMoment>> mapKartsLapNumberLapTimes = new HashMap<>();
         List<LapMoment> listOfFastestLapMoments;
         Map<Integer, List<LapMoment>> mapKartsWithLapNumberAndFastestLap = new HashMap<>();
@@ -96,7 +98,8 @@ public class LapMomentService implements LapMomentInterface {
     }
 
     private List<Double> getTotalRaceTimeOfAllKarts(Integer amountLaps, Integer amountKarts) {
-        Map<Integer, List<LapMoment>> allKartsLapTimesLapNumbers = getKartsLapNumbersLapMoments(amountLaps, amountKarts);
+        Map<Integer, List<LapMoment>> allKartsLapTimesLapNumbers = getKartsLapNumbersLapMoments(amountLaps,
+                amountKarts);
         List<Double> lapTimes = new LinkedList<>();
         for (List<LapMoment> lapMoments : allKartsLapTimesLapNumbers.values()) {
             Double sum = 0.0;

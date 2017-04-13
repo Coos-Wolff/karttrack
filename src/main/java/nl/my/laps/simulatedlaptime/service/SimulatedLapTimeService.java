@@ -2,7 +2,6 @@ package nl.my.laps.simulatedlaptime.service;
 
 import nl.my.laps.kart.model.Kart;
 import nl.my.laps.laptime.model.LapTime;
-import nl.my.laps.race.RaceRepository;
 import nl.my.laps.race.model.Race;
 import nl.my.laps.simulatedlaptime.interfaces.SimulatedLapTimeInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +13,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service("simulatedLapTimeService")
 public class SimulatedLapTimeService implements SimulatedLapTimeInterface {
-
-    @Autowired
-    RaceRepository raceRepository;
 
     private Double getSimulatedLapTime() {
         Double lapTime = ThreadLocalRandom.current().nextDouble(40.0, 50.0);
