@@ -21,7 +21,7 @@ public class Kart {
     @OneToMany(mappedBy = "kart")
     private Set<LapTime> lapTimes;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "race_id", nullable = false)
     private Race race;
 

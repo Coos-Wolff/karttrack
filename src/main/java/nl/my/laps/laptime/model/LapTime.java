@@ -16,13 +16,10 @@ public class LapTime {
     @Column(name = "time_lap")
     private Double timeLap;
 
-    @Column(name = "total_race_time")
-    private String totalRaceTime;
-
     @Column(name = "lap_number")
     private Integer labNumber;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "kart_id", nullable = false)
     private Kart kart;
 
@@ -40,14 +37,6 @@ public class LapTime {
 
     public void setTimeLap(Double timeLap) {
         this.timeLap = timeLap;
-    }
-
-    public String getTotalRaceTime() {
-        return totalRaceTime;
-    }
-
-    public void setTotalRaceTime(String totalRaceTime) {
-        this.totalRaceTime = totalRaceTime;
     }
 
     public Integer getLabNumber() {

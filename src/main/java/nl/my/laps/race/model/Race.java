@@ -17,7 +17,7 @@ public class Race {
     @Column(name = "id")
     private Long id;
 
-    @OneToMany(mappedBy = "race")
+    @OneToMany(mappedBy = "race", cascade = CascadeType.ALL)
     private Set<Kart> karts;
 
     public Long getId() {
