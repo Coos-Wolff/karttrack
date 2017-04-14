@@ -10,7 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "nl.my.laps")
 public class KartTrackApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(KartTrackApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(KartTrackApplication.class, args);
+    }
+
 }

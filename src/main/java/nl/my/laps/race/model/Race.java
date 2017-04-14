@@ -9,7 +9,8 @@ import java.util.Set;
 @Table(name = "race")
 public class Race {
 
-    public Race() {}
+    public Race() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

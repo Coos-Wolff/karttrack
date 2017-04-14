@@ -9,8 +9,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
+import java.text.DecimalFormat;
 import java.util.*;
 
 @Service("lapMomentService")
@@ -21,11 +20,12 @@ public class LapMomentService implements LapMomentInterface {
 
     @Override
     public LapMoment getFastestLapOfAllKarts(Integer amountLaps, Integer amountKarts) {
-        Map<Integer, List<LapMoment>> mapKartsLapNumbersLapMoments = getKartsLapNumbersLapMoments(amountLaps,
-                amountKarts);
-        Map<Integer, List<LapMoment>> mapFastestLapAndLapNumberAllKarts = getFastestLapsAndLapNumberOfAllKarts
-                (mapKartsLapNumbersLapMoments);
-        return getFastestLapMoment(mapFastestLapAndLapNumberAllKarts);
+        Map<Integer, List<LapMoment>> mapKartsLapNumbersLapMoments = getKartsLapNumbersLapMoments(amountLaps, amountKarts);
+        Map<Integer, List<LapMoment>> mapFastestLapAndLapNumberAllKarts = getFastestLapsAndLapNumberOfAllKarts(mapKartsLapNumbersLapMoments);
+        String totalRaceTime = getTotalRaceTime(mapKartsLapNumbersLapMoments);
+        LapMoment lapMoment = getFastestLapMoment(mapFastestLapAndLapNumberAllKarts);
+        lapMoment.setTotalRaceTime(totalRaceTime);
+        return lapMoment;
     }
 
     private Map<Integer, List<LapMoment>> getKartsLapNumbersLapMoments(Integer amountLaps, Integer amountKarts) {
@@ -45,8 +45,7 @@ public class LapMomentService implements LapMomentInterface {
         return mapOfKartsWithLapTimes;
     }
 
-    private Map<Integer, List<LapMoment>> getFastestLapsAndLapNumberOfAllKarts(Map<Integer, List<LapMoment>>
-                                                                                       mapAllOfKarts) {
+    private Map<Integer, List<LapMoment>> getFastestLapsAndLapNumberOfAllKarts(Map<Integer, List<LapMoment>> mapAllOfKarts) {
         Map<Integer, List<LapMoment>> mapKartsLapNumberLapTimes = new HashMap<>();
         List<LapMoment> listOfFastestLapMoments;
         Map<Integer, List<LapMoment>> mapKartsWithLapNumberAndFastestLap = new HashMap<>();
@@ -76,7 +75,7 @@ public class LapMomentService implements LapMomentInterface {
         List<LapMoment> lapMoments = new LinkedList<>();
         for (Map.Entry<Integer, List<LapMoment>> moment : fastestLap.entrySet()) {
             for (LapMoment entry : moment.getValue()) {
-                String lapMomentFormat = convertSecondsToMillisAndFormat(entry.getLapMoment());
+                String lapMomentFormat = convertDoubleToTimeFormat(entry.getLapMoment());
                 LapMoment lapMoment = new LapMoment();
                 lapMoment.setLapNumber(entry.getLapNumber());
                 lapMoment.setLapMoment(entry.getLapMoment());
@@ -88,18 +87,7 @@ public class LapMomentService implements LapMomentInterface {
         return lapMoments;
     }
 
-    private String convertSecondsToMillisAndFormat(Double seconds) {
-        MathContext mathContext = new MathContext(5);
-        BigDecimal formattedSeconds = new BigDecimal(seconds, mathContext);
-        String secondsToMillisString = String.valueOf(formattedSeconds);
-        String removeDot = secondsToMillisString.replace(".", "");
-        Long parsedMilliseconds = Long.parseLong(removeDot);
-        return DurationFormatUtils.formatDuration(parsedMilliseconds, "HH:mm:ss.SSS");
-    }
-
-    private List<Double> getTotalRaceTimeOfAllKarts(Integer amountLaps, Integer amountKarts) {
-        Map<Integer, List<LapMoment>> allKartsLapTimesLapNumbers = getKartsLapNumbersLapMoments(amountLaps,
-                amountKarts);
+    private List<Double> getTotalRaceTimeOfAllKarts(Map<Integer, List<LapMoment>> allKartsLapTimesLapNumbers) {
         List<Double> lapTimes = new LinkedList<>();
         for (List<LapMoment> lapMoments : allKartsLapTimesLapNumbers.values()) {
             Double sum = 0.0;
@@ -112,16 +100,16 @@ public class LapMomentService implements LapMomentInterface {
     }
 
     @Override
-    public String getTotalRaceTime(Integer amountLaps, Integer amountKarts) {
-        List<Double> totalLapTimes = getTotalRaceTimeOfAllKarts(amountLaps, amountKarts);
+    public String getTotalRaceTime(Map<Integer, List<LapMoment>> mapKartsLapNumbersLapMoments) {
+        List<Double> totalLapTimes = getTotalRaceTimeOfAllKarts(mapKartsLapNumbersLapMoments);
         Double totalRaceTimeInSeconds = Collections.max(totalLapTimes);
-        return convertSecondsToMinutesFormat(totalRaceTimeInSeconds);
+        return convertDoubleToTimeFormat(totalRaceTimeInSeconds);
     }
 
-    private String convertSecondsToMinutesFormat(Double seconds) {
-        MathContext mathContext = new MathContext(6);
-        BigDecimal formattedSeconds = new BigDecimal(seconds, mathContext);
-        String secondsToMillisString = String.valueOf(formattedSeconds);
+    private String convertDoubleToTimeFormat(Double seconds) {
+        DecimalFormat format = new DecimalFormat("0.000");
+        Double formatted = new Double(format.format(seconds));
+        String secondsToMillisString = String.valueOf(formatted);
         String removeDot = secondsToMillisString.replace(".", "");
         Long parsedMilliseconds = Long.parseLong(removeDot);
         return DurationFormatUtils.formatDuration(parsedMilliseconds, "HH:mm:ss.SSS");
